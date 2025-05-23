@@ -18,7 +18,7 @@ export default $config({
 		new sst.aws.Function("MainFunction", {
 			handler: "src/lambda.handler",
 			runtime: "nodejs22.x",
-			memory: "3000 MB",
+			memory: "512 MB",
 			timeout: "900 seconds",
 			url: true,
 			architecture: "arm64",
