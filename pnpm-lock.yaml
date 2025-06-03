@@ -23,6 +23,9 @@ importers:
       json-schema-to-zod:
         specifier: ^2.6.1
         version: 2.6.1
+      lambda-stream:
+        specifier: ^0.6.0
+        version: 0.6.0
       sst:
         specifier: 3.16.0
         version: 3.16.0
@@ -408,6 +411,9 @@ packages:
     resolution: {integrity: sha512-3QItJOXp2AP1uv7waBkao5nCvhEv+QmJAd38Ybq7wNI74Q+BBmnLn4EDKz6yI9xGAIQoUF87qHt+kc1IVxB4zQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
+
+  lambda-stream@0.6.0:
+    resolution: {integrity: sha512-S625+Jdil56zFOtfBt5r0snP8SIBY7fXn7pLKXQ8C6u9A5kNSuEWcEVC05QoDkvBLjMhwBeIUwVU6PoOB7ll5w==}
 
   lru-cache@6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
@@ -1095,6 +1101,8 @@ snapshots:
       '@types/diff-match-patch': 1.0.36
       chalk: 5.4.1
       diff-match-patch: 1.0.5
+
+  lambda-stream@0.6.0: {}
 
   lru-cache@6.0.0:
     dependencies:

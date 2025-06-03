@@ -9,6 +9,7 @@
 		"@ai-sdk/openai": "^1.3.22",
 		"ai": "^4.3.16",
 		"json-schema-to-zod": "^2.6.1",
+		"lambda-stream": "^0.6.0",
 		"sst": "3.16.0",
 		"superjson": "^2.2.2",
 		"zod": "^3.25.23"

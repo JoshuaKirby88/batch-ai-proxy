@@ -22,6 +22,7 @@ export default $config({
 			timeout: "900 seconds",
 			url: true,
 			architecture: "arm64",
+			streaming: true,
 		})
 	},
 })

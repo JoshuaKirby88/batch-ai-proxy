@@ -1,19 +1,23 @@
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda"
+import { APIGatewayProxyEventV2 } from "aws-lambda"
+import { ResponseStream, streamifyResponse } from "lambda-stream"
 import SuperJSON from "superjson"
 import { AIServiceInstance } from "./ai.service"
 import { LambdaInput } from "./types"
 
-export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+const _handler = async (event: APIGatewayProxyEventV2, responseStream: ResponseStream): Promise<void> => {
+	responseStream.setContentType("application/json")
 	const apiKey = event.headers["x-api-key"]
 	const inputs: LambdaInput[] = JSON.parse(event.body)
 
 	console.log("inputs", inputs)
 
 	if (!apiKey) {
-		return {
-			statusCode: 401,
-			body: JSON.stringify({ message: "API Key missing" }),
-		}
+		responseStream.destroy(new Error("API Key missing"))
+
+		// return {
+		// 	statusCode: 401,
+		// 	body: JSON.stringify({ message: "API Key missing" }),
+		// }
 	}
 
 	const AIService = new AIServiceInstance({ apiKey })
@@ -36,8 +40,13 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 
 	const superJson = SuperJSON.stringify(responses.map(response => ({ ...response })))
 
-	return {
-		statusCode: 200,
-		body: superJson,
-	}
+	responseStream.write(superJson)
+	responseStream.end()
+
+	// return {
+	// 	statusCode: 200,
+	// 	body: superJson,
+	// }
 }
+
+export const handler = streamifyResponse(_handler)
