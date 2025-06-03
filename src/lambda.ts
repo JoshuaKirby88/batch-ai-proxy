@@ -4,49 +4,50 @@ import SuperJSON from "superjson"
 import { AIServiceInstance } from "./ai.service"
 import { LambdaInput } from "./types"
 
-const _handler = async (event: APIGatewayProxyEventV2, responseStream: ResponseStream): Promise<void> => {
-	responseStream.setContentType("application/json")
-	const apiKey = event.headers["x-api-key"]
-	const inputs: LambdaInput[] = JSON.parse(event.body)
+const _handler = (event: APIGatewayProxyEventV2, responseStream: ResponseStream): Promise<void> => {
+	return new Promise(async resolve => {
+		try {
+			const apiKey = event.headers["x-api-key"]
+			const inputs: LambdaInput[] = JSON.parse(event.body)
 
-	console.log("inputs", inputs)
-
-	if (!apiKey) {
-		responseStream.destroy(new Error("API Key missing"))
-
-		// return {
-		// 	statusCode: 401,
-		// 	body: JSON.stringify({ message: "API Key missing" }),
-		// }
-	}
-
-	const AIService = new AIServiceInstance({ apiKey })
-
-	const responses = await Promise.all(
-		inputs.map(async input => {
-			// Generate text
-			if (!input.jsonSchema) {
-				return await AIService.getCompletion(input)
+			if (!apiKey) {
+				throw new Error("API key is missing")
 			}
 
-			// Generate object
-			else {
-				return await AIService.getStructuredCompletion(input)
-			}
-		}),
-	)
+			console.log("inputs", inputs)
 
-	console.log("responses", responses)
+			const AIService = new AIServiceInstance({ apiKey })
 
-	const superJson = SuperJSON.stringify(responses.map(response => ({ ...response })))
+			const responses = await Promise.all(
+				inputs.map(async input => {
+					// Generate text
+					if (!input.jsonSchema) {
+						return await AIService.getCompletion(input)
+					}
 
-	responseStream.write(superJson)
-	responseStream.end()
+					// Generate object
+					else {
+						return await AIService.getStructuredCompletion(input)
+					}
+				}),
+			)
 
-	// return {
-	// 	statusCode: 200,
-	// 	body: superJson,
-	// }
+			console.log("responses", responses)
+
+			const superJson = SuperJSON.stringify(responses.map(response => ({ ...response })))
+			responseStream.write(superJson)
+			responseStream.end()
+			resolve()
+		} catch (error) {
+			console.log("error", error)
+
+			const superJson = SuperJSON.stringify(error)
+			console.log("superJson", superJson)
+			responseStream.write(superJson)
+			responseStream.end()
+			resolve()
+		}
+	})
 }
 
 export const handler = streamifyResponse(_handler)
